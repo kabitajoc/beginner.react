@@ -4,15 +4,15 @@ import "./Todo.css";
 function Todo() {
   const [inputList, setInputList] = useState("");
   const [items, setItems] = useState([]);
-  const [editList,setEditList]=useState([]);
- 
+
   const itemEvent = (event) => {
     setInputList(event.target.value);
-    console.log(event.target.value);
   };
+
   const handleSubmit = (e) => {
     e.preventDefault();
   };
+
   const handleAdd = () => {
     setItems((todos) => {
       return [
@@ -20,41 +20,35 @@ function Todo() {
         {
           id: Date.now(),
           task: inputList,
+          isEditing: false,
         },
       ];
     });
     setInputList("");
   };
 
-  const handleEdit = (e,id) => {
-    const editedTask = items.find((item) => item.id === id);
-    if (editedTask) {
-      setEditList([].task);
-      // e.target
-      setEditItemId(id);
-    }
-    
-
+  const handleEdit = (id) => {
+    setItems(items.map(item => {
+      if(item.id === id) {
+        return {...item, isEditing: true}
+      }
+      return item;
+    }));
   };
 
-  // const handleEdit = (id) => {
-  //   const editedTask = items.find((item) => item.id === id);
-  //   console.log(editedTask);
-  // };
+  const handleSaveEdit = (e, id) => {
+    const editedTask = e.target.value;
 
-  // const handleSaveEdit = () => {
-  //   setItems((items) => {
-  //     return items.map((item) =>
-  //       item.id === editItemId ? { ...item, task: inputList } : item
-  //     );
-  //   })}
-  //   setInputList("");
-  //   setEditItemId(null);
-  // };
+    setItems(items.map(item => {
+      if(item.id === id) {
+        return {...item, task: editedTask, isEditing: false}
+      }
+      return item;
+    }));
+  };
+
   const handleDelete = (id) => {
-    const delItems = items.filter((item) => item.id !== id);
-    console.log(delItems);
-    setItems([...delItems]);
+    setItems(items.filter(item => item.id !== id));
   };
 
   return (
@@ -74,12 +68,22 @@ function Todo() {
       <ul>
         {items.map((item) => (
           <li className="myTodo" key={item.id} id={item.id}>
-            <span>{item.task}</span>
-            <input type="text" 
-            disabled="true" 
-             className="edit-input" />
+            {!item.isEditing ? (
+              <span>{item.task}</span>
+            ) : (
+              <input
+                type="text"
+                defaultValue={item.task}
+                onBlur={(e) => handleSaveEdit(e, item.id)}
+                className="edit-input"
+              />
+            )}
             <div className="todos-btn">
-              <button onClick={(e) => handleEdit(e,item.id)}>Edit</button>
+              {!item.isEditing ? (
+                <button onClick={() => handleEdit(item.id)}>Edit</button>
+              ) : (
+                <button onClick={(e) => handleSaveEdit(e, item.id)}>Save</button>
+              )}
               <button onClick={() => handleDelete(item.id)}>Delete</button>
             </div>
           </li>
