@@ -4,6 +4,7 @@ import "./Todo.css";
 function Todo() {
   const [inputList, setInputList] = useState("");
   const [items, setItems] = useState([]);
+  console.log(items);
 
   const itemEvent = (event) => {
     setInputList(event.target.value);
@@ -28,27 +29,35 @@ function Todo() {
   };
 
   const handleEdit = (id) => {
-    setItems(items.map(item => {
-      if(item.id === id) {
-        return {...item, isEditing: true}
-      }
-      return item;
-    }));
+    setItems(
+      items.map((item) => {
+        if (item.id === id) {
+          return { ...item, isEditing: true };
+        }
+        return item;
+      })
+    );
   };
 
   const handleSaveEdit = (e, id) => {
     const editedTask = e.target.value;
 
-    setItems(items.map(item => {
-      if(item.id === id) {
-        return {...item, task: editedTask, isEditing: false}
-      }
-      return item;
-    }));
+    setItems((prev) =>
+      prev.map((item) => {
+        if (item.id === id) {
+          return { ...item, task: editedTask, isEditing: false };
+        }
+        return item;
+      })
+    );
   };
+  const handleEditChange =(e)=>{
+    const editedTask = e.target.value;
+
+  }
 
   const handleDelete = (id) => {
-    setItems(items.filter(item => item.id !== id));
+    setItems(items.filter((item) => item.id !== id));
   };
 
   return (
@@ -74,7 +83,7 @@ function Todo() {
               <input
                 type="text"
                 defaultValue={item.task}
-                onBlur={(e) => handleSaveEdit(e, item.id)}
+                onChange={(e) => handleSaveEdit(e, item.id)}
                 className="edit-input"
               />
             )}
@@ -82,7 +91,9 @@ function Todo() {
               {!item.isEditing ? (
                 <button onClick={() => handleEdit(item.id)}>Edit</button>
               ) : (
-                <button onClick={(e) => handleSaveEdit(e, item.id)}>Save</button>
+                <button onClick={(e) => handleSaveEdit(e, item.id)}>
+                  Save
+                </button>
               )}
               <button onClick={() => handleDelete(item.id)}>Delete</button>
             </div>
